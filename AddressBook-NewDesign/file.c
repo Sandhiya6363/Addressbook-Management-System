@@ -20,9 +20,8 @@ void saveContactsToFile(AddressBook *addressBook) {
   
 }
 
-void loadContactsFromFile(AddressBook *addressBook) {
-   
-
+void loadContactsFromFile(AddressBook *addressBook)
+{
     FILE *fp = fopen("contacts.csv", "r");
 
     if (fp == NULL)
@@ -31,39 +30,82 @@ void loadContactsFromFile(AddressBook *addressBook) {
         return;
     }
 
-
-    addressBook->contactCount =0;
     int count;
-    fscanf(fp,"%d\n",&count);
-    for(int i=0;i<count;i++)
+
+    addressBook->contactCount = 0;
+
+    // Read contact count
+    if (fscanf(fp, "%d\n", &count) != 1)
     {
-        char name[30],phone[20],email[50];
-    if (fscanf(fp, "%[^,],%[^,],%[^\n]\n",name,phone,email)==3)
+        printf("Invalid file format.\n");
+        fclose(fp);
+        return;
+    }
+
+    // Read contacts
+    for (int i = 0; i < count; i++)
     {
-        if(validate_phone(phone)==0)
+        char name[30];
+        char phone[20];
+        char email[50];
+
+        // Check address book capacity
+        if (addressBook->contactCount >= MAX_CONTACTS)
         {
-            printf("Invalid contact: %s- not loaded.\n",name);
+            printf("AddressBook is full. Remaining contacts not loaded.\n");
+            break;
+        }
+
+        // Read one contact
+        if (fscanf(fp, "%[^,],%[^,],%[^\n]\n",
+                   name, phone, email) != 3)
+        {
+            printf("Invalid contact format. Contact not loaded.\n");
             continue;
         }
-        if(validate_name(name)==0)
+
+        // Validate name
+        if (!validate_name(name))
         {
-            printf("Invalid contact: %s -not loaded.\n",name);
+            printf(" Contact not loaded.\n");
             continue;
         }
-        if(validate_email(email)==0)
+
+        // Validate phone
+        if (!validate_phone(phone))
         {
-            printf("Invalid email: %s -not loaded.\n",name);
+            printf("Invalid phone number: %s. Contact not loaded.\n", phone);
             continue;
         }
-        strcpy(addressBook->contacts[addressBook->contactCount].name,name);
-        strcpy(addressBook->contacts[addressBook->contactCount].phone,phone);
-        strcpy(addressBook->contacts[addressBook->contactCount].email,email);
-    
+
+        // Validate email
+        if (!validate_email(email))
+        {
+            printf("Invalid email: %s. Contact not loaded.\n", email);
+            continue;
+        }
+
+        // Check duplicate phone
+        if (!unique_phone(addressBook, phone, -1))
+        {
+            printf("Duplicate phone number: %s. Contact not loaded.\n", phone);
+            continue;
+        }
+
+        // Check duplicate email
+        if (!unique_email(addressBook, email, -1))
+        {
+            printf("Duplicate email: %s. Contact not loaded.\n", email);
+            continue;
+        }
+
+        // Store valid contact
+        strcpy(addressBook->contacts[addressBook->contactCount].name, name);
+        strcpy(addressBook->contacts[addressBook->contactCount].phone, phone);
+        strcpy(addressBook->contacts[addressBook->contactCount].email, email);
+
         addressBook->contactCount++;
     }
-    }
+
     fclose(fp);
 }
-
-    
-
