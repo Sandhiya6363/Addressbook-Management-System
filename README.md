@@ -16,6 +16,6 @@ A menu-driven **Address Book Management System developed in C** to manage contac
 - Dynamic Memory Allocation
 
 ### 👩‍💻 Author
-**Sandhiya Selvaraj**
+**Sandhiya selvaraj**
 
 > A project built to strengthen my C programming and problem-solving skills. 🚀
