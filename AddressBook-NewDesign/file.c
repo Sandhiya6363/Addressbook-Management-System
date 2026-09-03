@@ -7,7 +7,7 @@ void saveContactsToFile(AddressBook *addressBook) {
     FILE *fp=fopen("contacts.csv","w");
     if(fp==NULL)
     {
-        perror("");
+        perror("File opening failed\n");
         return;
     }
     fprintf(fp,"%d\n",addressBook->contactCount);
@@ -57,11 +57,12 @@ void loadContactsFromFile(AddressBook *addressBook)
         }
 
         // Read one contact
-        if (fscanf(fp, "%[^,],%[^,],%[^\n]\n",
-                   name, phone, email) != 3)
+       
+
+        if (fscanf(fp, "%29[^,],%19[^,],%49[^\n]\n",name, phone, email) != 3)
         {
-            printf("Invalid contact format. Contact not loaded.\n");
-            continue;
+        printf("Invalid contact format. Contact not loaded.\n");
+        continue;
         }
 
         // Validate name
